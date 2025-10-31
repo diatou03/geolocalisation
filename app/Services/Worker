@@ -1,0 +1,10 @@
+self.addEventListener('fetch', event => {
+  if (event.request.url.includes('/api/weather')) {
+    event.respondWith(caches.open('weather-api').then(cache =>
+      fetch(event.request).then(resp => {
+        cache.put(event.request, resp.clone());
+        return resp;
+      }).catch(() =>	cache.match(event.request))
+    ));
+  }
+});
