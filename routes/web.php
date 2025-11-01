@@ -117,6 +117,8 @@ Route::get('/positions/json', [PositionController::class, 'getPositions'])->name
 Route::post('/api/positions', [PositionController::class, 'store'])->name('positions.store');
 
 Route::post('/positions', [PositionController::class, 'store']);
+Route::get('/positions', [App\Http\Controllers\PositionController::class, 'index']);
+Route::get('/map', [App\Http\Controllers\PositionController::class, 'map']);
 
 // Authentification
 Route::get('/logs', [LoginlogController::class, 'logs'])->name('login.logs');
@@ -129,19 +131,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // API météo et marées pour JS (JSON)
 Route::get('/api/weather', [HomeController::class, 'weather'])->name('api.weather');
 Route::get('/api/tides', [HomeController::class, 'tides'])->name('api.tides');
-
-// --- Authentification ---
-// Route::get('/login', [LoginlogController::class, 'login']);
-// Route::get('/login', [LoginlogController::class, 'index'])->name('login');
-// Route::get('/login', [LoginlogController::class, 'index'])->name('login.index');
-// Route::post('/login', [LoginlogController::class, 'authenticate'])->name('login.post');
-// Route::get('/login', [LoginlogController::class, 'index'])->name('login.post');
-// Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
-
-// Traitement du login
-// Route::get('/register', [LoginlogController::class, 'registerForm'])->name('register');
-// Route::post('/register', [LoginlogController::class, 'register'])->name('register.post');
-// Route::post('/logout', [LoginlogController::class, 'logout'])->name('logout');
 
 // --- Tableau de bord (protégé par login) ---
 // Route::middleware('auth')->group(function () {
@@ -189,6 +178,6 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 
 Route::get('/', [WelcomeController::class, 'weather'])->name('welcome');
  Route::get('/weather', [WelcomeController::class, 'weather'])->name('weather.show');
-// Route::get('/api/weather', [WeatherController::class, 'weather'])->name('weather.api');
+ Route::get('/api/weather', [WeatherController::class, 'weather'])->name('weather.api');
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');

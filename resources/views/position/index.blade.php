@@ -1,36 +1,48 @@
 @extends('layouts.app')
 
+@section('title', 'Suivi des positions GPS')
+
 @section('content')
-<div class="container">
-    <h2>📍 Positions GPS en temps réel</h2>
-    <button id="refreshBtn" class="btn btn-primary mb-3">🔄 Actualiser</button>
-    <div id="map" style="height: 600px;"></div>
+<div class="container mt-5">
+    <h1 class="mb-4 text-center text-primary">
+        <i class="fa-solid fa-location-dot"></i> Suivi des positions GPS
+    </h1>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <table class="table table-striped table-bordered align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Appareil</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Altitude (m)</th>
+                        <th>Vitesse (km/h)</th>
+                        <th>Satellites</th>
+                        <th>Horodatage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($positions as $pos)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $pos->device_id }}</td>
+                            <td>{{ number_format($pos->latitude, 6) }}</td>
+                            <td>{{ number_format($pos->longitude, 6) }}</td>
+                            <td>{{ $pos->altitude ?? '-' }}</td>
+                            <td>{{ $pos->speed ?? '-' }}</td>
+                            <td>{{ $pos->satellites ?? '-' }}</td>
+                            <td>{{ $pos->timestamp ?? $pos->created_at->format('Y-m-d H:i:s') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-muted">Aucune donnée GPS reçue pour le moment.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
-let map = L.map('map').setView([14.7167, -17.4677], 8);
-let markers = L.layerGroup().addTo(map);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-function loadPositions() {
-    fetch('/api/positions')
-        .then(res=>res.json())
-        .then(data=>{
-            markers.clearLayers();
-            data.forEach(pos=>{
-                L.marker([pos.latitude,pos.longitude])
-                 .bindPopup(`Device: ${pos.device_id}<br>Lat: ${pos.latitude}<br>Lon: ${pos.longitude}<br>Speed: ${pos.speed} km/h`)
-                 .addTo(markers);
-            });
-        });
-}
-
-document.getElementById('refreshBtn').addEventListener('click', loadPositions);
-loadPositions();
-setInterval(loadPositions,15000);
-</script>
 @endsection

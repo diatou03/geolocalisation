@@ -49,3 +49,4 @@ Route::post('/meshtastic', [MeshtasticController::class, 'store'])->name('api.me
 // =======================
 Route::get('/positions', [PositionController::class, 'index'])->name('api.positions.index');
 Route::post('/positions', [PositionController::class, 'store'])->name('api.positions.store');
+Route::get('/positions', [PositionController::class, 'apiIndex']);
