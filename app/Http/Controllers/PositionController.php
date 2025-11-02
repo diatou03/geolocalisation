@@ -47,7 +47,7 @@ class PositionController extends Controller
    }
     public function map()
     {
-    return view('positions.map');
+    return view('position.map');
     }
 
 }

@@ -151,7 +151,7 @@
         <h3>GPS</h3>
     </a> 
 
-    <a href="{{ route('positions.json') }}" class="card">
+    <a href="{{ route('positions.map') }}" class="card">
         <x-fas-map-marker-alt class="icon-small text-red-600" />
         <h3>Positions</h3>
     </a>

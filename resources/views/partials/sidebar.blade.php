@@ -6,7 +6,7 @@
       ['label' => 'Alertes', 'route' => 'alertes.index', 'icon' => 'bi-ship'],
       ['label' => 'Pirogues', 'route' => 'pirogues.index', 'icon' => 'bi-ship'],
       ['label' => 'GPS', 'route' => 'gps.map', 'icon' => 'bi-geo-alt'],
-      ['label' => 'Position', 'route' => 'position.json', 'icon' => 'bi-geo-alt'],
+      ['label' => 'Positions', 'route' => 'positions.map', 'icon' => 'bi-geo-alt'],
       ['label' => 'Météo', 'route' => 'weather.show', 'icon' => 'bi-cloud-rain'],
       ['label' => 'Marées', 'route' => 'tides.index', 'icon' => 'bi-water'],
       ['label' => 'Agents marins', 'route' => 'agent_marins.index', 'icon' => 'bi-person']

@@ -113,6 +113,10 @@ Route::post('/logout', function(Request $request) {
 
 // Routes pour la gestion des positions GPS
 Route::get('/positions', [PositionController::class, 'index'])->name('positions.index');
+Route::get('/positions', [PositionController::class, 'map'])->name('positions.map');
+
+Route::get('/positions/map', [PositionController::class, 'map'])->name('positions.map');
+
 Route::get('/positions/json', [PositionController::class, 'getPositions'])->name('positions.json');
 Route::post('/api/positions', [PositionController::class, 'store'])->name('positions.store');
 
@@ -147,6 +151,7 @@ Route::get('/weather/{city?}', [WeatherController::class, 'show'])->name('weathe
 // Routes marées
 Route::get('/tides', [TideController::class, 'getTidesJson'])->name('tides.json'); 
 Route::get('/tides', [TideController::class, 'index'])->name('tides.index');
+// Route::get('tides/{tide}', [TideController::class, 'show'])->name('tides.show');
 
 // / Page de connexion
 Route::get('/login', [LoginlogController::class, 'index'])->name('login');

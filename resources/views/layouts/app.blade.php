@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@yield('title', 'NAP AK KARANGUE')</title>
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
@@ -15,15 +14,29 @@
       overflow-x: hidden;
       font-family: 'Roboto', sans-serif;
       background-color: #f5f6fa;
+      padding-top: 16vh; /* espace pour navbar fixe */
     }
 
-    /* --- Navbar --- */
+    /* --- Navbar fixe et centrée --- */
     .navbar-custom {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 16vh;
       background-color: rgb(12, 72, 141);
       display: flex;
       align-items: center;
+      z-index: 1030;
+      padding: 0 1rem;
+    }
+
+    .navbar-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .navbar-brand {
@@ -33,33 +46,29 @@
       font-weight: bold;
       color: #fff;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+      white-space: nowrap;
+      font-size: 1.8rem;
+      text-align: center;
     }
 
-    .navbar-toggler {
-      z-index: 200;
-    }
-
-    @media (min-width: 992px) {
-      .navbar-toggler { display: none; }
-    }
+    .navbar-toggler { z-index: 1050; }
 
     /* --- Sidebar --- */
     .sidebar {
       position: fixed;
-      top: 16vh;
+      top: 16vh; /* après navbar */
       left: 0;
-      height: 84vh;
+      height: calc(100vh - 16vh);
       width: 250px;
       background-color: #0d0056e3;
       color: white;
       padding: 1rem;
       overflow-y: auto;
       transition: all 0.3s;
+      z-index: 1020;
     }
 
-    .sidebar.collapsed {
-      width: 70px;
-    }
+    .sidebar.collapsed { width: 70px; }
 
     .sidebar .nav-link {
       color: white;
@@ -76,7 +85,6 @@
       border-radius: 0.25rem;
     }
 
-    /* Uniformiser icônes */
     .sidebar .nav-link .menu-icon,
     .sidebar .nav-link img {
       width: 20px;
@@ -88,43 +96,31 @@
     }
 
     .sidebar .nav-link:hover .menu-icon,
-    .sidebar .nav-link:hover img {
-      transform: scale(1.2);
-    }
+    .sidebar .nav-link:hover img { transform: scale(1.2); }
 
-    /* Sidebar scroll style */
-    .sidebar::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-      background-color: #ffc107;
-      border-radius: 3px;
-    }
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-thumb { background-color: #ffc107; border-radius: 3px; }
 
     /* --- Main content --- */
     main.content {
       margin-left: 250px;
       padding: 2rem;
-      min-height: 84vh;
+      min-height: calc(100vh - 16vh);
       transition: margin-left 0.3s;
     }
-
-    .sidebar.collapsed ~ main.content {
-      margin-left: 70px;
-    }
-
-    /* --- Pirogue icon --- */
     .pirogue {
-      filter: brightness(0) invert(1);
-      transition: filter 0.3s, transform 0.3s;
-    }
+  filter: brightness(0) invert(1); /* rend blanc sur fond sombre */
+  transition: transform 0.3s, filter 0.3s;
+}
 
-    .nav-link.active .pirogue,
-    .nav-link:hover .pirogue {
-      filter: brightness(0) saturate(100%) invert(89%) sepia(95%) saturate(5791%) hue-rotate(2deg) brightness(101%) contrast(101%);
-      transform: scale(1.2);
-    }
+.nav-link.active .pirogue,
+.nav-link:hover .pirogue {
+  transform: scale(1.2);
+  filter: brightness(0) saturate(100%) invert(89%) sepia(95%) saturate(5791%) hue-rotate(2deg) brightness(101%) contrast(101%);
+}
+
+
+    .sidebar.collapsed ~ main.content { margin-left: 70px; }
 
     /* --- Responsive --- */
     @media (max-width: 992px) {
@@ -137,16 +133,20 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-3">
-    <div class="container-fluid px-0">
-      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarCanvas"
-        aria-controls="sidebarCanvas">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+  <div class="navbar-container">
+    <!-- Toggler gauche -->
+    <button class="navbar-toggler" type="button" aria-label="Toggle sidebar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <a class="navbar-brand fw-bold" href="#">NAP AK KARANGUE</a>
+    <!-- Titre centré -->
+    <a class="navbar-brand fw-bold" href="#">NAP AK KARANGUE</a>
 
-      <div class="dropdown ms-auto">
+    <!-- Dropdown utilisateur droite -->
+    <div class="ms-auto">
+      <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white dropdown-toggle" id="userMenu"
            data-bs-toggle="dropdown" aria-expanded="false">
           <img src="https://via.placeholder.com/32" class="rounded-circle" alt="utilisateur">
@@ -154,7 +154,7 @@
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
           <li><h6 class="dropdown-header">Utilisateur</h6></li>
           <li><a class="dropdown-item" href="#">Profil</a></li>
-          <li><div class="dropdown-divider"></div></li>
+          <li><hr class="dropdown-divider"></li>
           <li>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
@@ -164,7 +164,8 @@
         </ul>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebarCanvas">
@@ -176,7 +177,7 @@
           ['label' => 'Alertes', 'route' => 'alertes.index', 'icon' => 'bi-bell'],
           ['label' => 'Pirogues', 'route' => 'pirogues.index', 'icon' => 'bi-boat'],
           ['label' => 'GPS', 'route' => 'gps.map', 'icon' => 'bi-geo-alt'],
-           ['label' => 'Positions', 'route' => 'positions.json', 'icon' => 'bi-geo-alt'],
+          ['label' => 'Positions', 'route' => 'positions.map', 'icon' => 'bi-geo-alt'],
           ['label' => 'Météo', 'route' => 'weather.show', 'icon' => 'bi-cloud-rain'],
           ['label' => 'Marées', 'route' => 'tides.index', 'icon' => 'bi-water'],
           ['label' => 'Agents marins', 'route' => 'agent_marins.index', 'icon' => 'bi-person']
@@ -206,5 +207,16 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script toggle sidebar mobile -->
+  <script>
+    const sidebar = document.getElementById('sidebarCanvas');
+    const toggler = document.querySelector('.navbar-toggler');
+
+    toggler.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
+  </script>
+
 </body>
 </html>

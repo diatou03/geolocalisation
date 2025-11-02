@@ -11,7 +11,7 @@ body {
     padding: 0;
 }
 
-/* En-tête accueil */
+/* En-tête */
 .header-home {
     text-align: center;
     margin-top: 50px;
@@ -26,10 +26,11 @@ body {
     color: #333;
 }
 
-/* Formulaire météo */
+/* Barre de recherche + bouton marée */
 .search-form-home {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 20px;
@@ -38,10 +39,11 @@ body {
     padding: 9px 15px;
     border-radius: 50px;
     border: 1px solid #ccc;
-    width: 600px;
+    width: 350px;
 }
-.search-form-home button {
-    padding: 17px 30px;
+.search-form-home button,
+.btn-tides {
+    padding: 10px 20px;
     border-radius: 50px;
     border: none;
     background-color: #0056b3;
@@ -49,61 +51,21 @@ body {
     cursor: pointer;
     transition: 0.3s;
 }
-.search-form-home button:hover {
+.search-form-home button:hover,
+.btn-tides:hover {
     background-color: #003f7f;
 }
-
-/* Boutons marées */
 .btn-tides {
-    background-color: #17a2b8;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 45px;
-    text-decoration: none;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
+    background-color: white;
+    border: 1px solid #0056b3;
+    color: #0056b3;
 }
 .btn-tides:hover {
-    background-color: #138496;
-}
-
-/* Onglets météo */
-.weather-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 30px 0 15px 0;
-}
-.weather-tab {
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 800;
-    transition: background 0.3s, color 0.3s;
-}
-.weather-tab.active {
     background-color: #0056b3;
     color: white;
 }
-.weather-tab.inactive {
-    background-color: #f0f0f0;
-    color: #333;
-}
 
-/* Conteneurs météo */
-.weather-container-home {
-    max-width: 900px;
-    margin: 0 auto 50px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-
-/* Grille météo */
+/* Grilles météo */
 .weather-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -128,21 +90,15 @@ body {
     color: #0056b3;
     margin-bottom: 10px;
 }
-.weather-box h4 {
-    margin: 10px 0 5px;
-    font-size: 16px;
-    color: #333;
-}
-.weather-box p {
-    font-size: 14px;
-    color: #555;
-}
+.weather-box h4 { font-size: 16px; color: #333; }
+.weather-box p { font-size: 14px; color: #555; }
 
 /* Carte */
 #map {
     border-radius: 0.5rem;
     height: 400px;
     width: 100%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
 }
 
 /* Responsive */
@@ -154,151 +110,136 @@ body {
 @endsection
 
 @section('content')
-<div class="header-home">
-    {{-- <h1>🌊 Nap Ak Karangue</h1> --}}
-    {{-- <p>Bienvenue sur la plateforme de sécurité en mer.<br> --}}
-       {{-- Consultez la <strong>météo</strong> et les <strong>marées</strong> selon votre commune.</p> --}}
+<div class="container my-5">
+    {{-- <h1 class="text-center mb-4">🌊 Nap Ak Karangue</h1> --}}
 
-    {{-- Formulaire météo --}}
-    <form class="search-form-home" method="GET" action="{{ route('weather.show') }}">
-        <input type="text" name="city" placeholder="Entrez une ville" value="{{ $city ?? 'Dakar' }}">
-        <button type="submit"><i class="fa-solid fa-cloud-sun me-1"></i> Voir la météo</button>
-        {{-- Bouton vers page marées --}}
-        <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
-        <a href="{{ route('tides.index') }}" class="btn-tides">
-            <i class="fa-solid fa-water"></i> Marées par commune
-         </a>
-         </div>
+    <!--  Formulaire de recherche + bouton marées -->
+    <form method="GET" action="{{ route('welcome') }}" class="search-form-home">
+        <input type="text" name="city" class="form-control" placeholder="Entrez une ville (ex: Dakar)"
+               value="{{ $city ?? '' }}">
+        <button class="btn btn-primary" type="submit">Rechercher</button>
+        <a href="{{ route('tides.index') }}" class="btn-tides"> Marées par commune</a>
     </form>
 
-    
-</div>
+    <!--  Onglets météo -->
+    <div class="text-center mb-4">
+        <button class="btn btn-outline-primary {{ $type === 'current' ? 'active' : '' }}" onclick="showTab('current')">
+            ☀️ Météo actuelle
+        </button>
+        <button class="btn btn-outline-primary {{ $type === 'forecast' ? 'active' : '' }}" onclick="showTab('forecast')">
+            📅 Prévisions 3 jours
+        </button>
+    </div>
 
-{{-- Onglets météo --}}
-<div class="weather-tabs">
-    {{-- <div class="weather-tab {{ ($type ?? 'current') === 'current' ? 'active' : 'inactive' }}" onclick="showTab('current')">🌤️ Météo actuelle</div> --}}
-    {{-- <div class="weather-tab {{ ($type ?? '') === 'forecast' ? 'active' : 'inactive' }}" onclick="showTab('forecast')">📅 Prévisions 3 jours</div> --}}
-    {{-- <div class="weather-tab {{ ($type ?? '') === 'historical' ? 'active' : 'inactive' }}" onclick="showTab('historical')">🕓 Météo passée</div> --}}
-</div>
+    <!--  Météo actuelle -->
+    @if($type === 'current' && $weather)
+    <div class="card shadow p-4 mx-auto" style="max-width: 800px;">
+        <h3 class="text-center mb-3">{{ ucfirst($city) }}</h3>
 
-{{-- Conteneur météo --}}
-<div class="weather-container-home">
-    @php
-        function getWeatherClass($icon) {
-            $code = substr($icon,0,2);
-            switch($code){
-                case '01': return 'weather-clear';
-                case '02': case '03': case '04': return 'weather-clouds';
-                case '09': case '10': return 'weather-rain';
-                case '11': return 'weather-thunderstorm';
-                case '13': return 'weather-snow';
-                case '50': return 'weather-mist';
-                default: return 'weather-default';
-            }
-        }
-    @endphp
-
-    {{-- Météo actuelle --}}
-    @if(($type ?? 'current') === 'current' && !empty($weather['weather'][0]))
-        @php
-            $icon = $weather['weather'][0]['icon'] ?? '01d';
-            $desc = ucfirst($weather['weather'][0]['description'] ?? '');
-            $weatherClass = getWeatherClass($icon);
-        @endphp
-        <h3 class="text-center">Météo actuelle à {{ ucfirst($city ?? 'Dakar') }}</h3>
-        <div class="weather-info-grid">
-            <div class="weather-box {{ $weatherClass }}">
-                <i class="fa-solid fa-temperature-half icon"></i>
-                <h4>Température</h4>
-                <p>{{ $weather['main']['temp'] ?? '?' }} °C</p>
-            </div>
-            <div class="weather-box {{ $weatherClass }}">
-                <i class="fa-solid fa-droplet icon"></i>
-                <h4>Humidité</h4>
-                <p>{{ $weather['main']['humidity'] ?? '?' }} %</p>
-            </div>
-            <div class="weather-box {{ $weatherClass }}">
-                <i class="fa-solid fa-wind icon"></i>
-                <h4>Vent</h4>
-                <p>{{ $weather['wind']['speed'] ?? '?' }} km/h</p>
-            </div>
-            <div class="weather-box {{ $weatherClass }}">
-                <i class="fa-solid fa-gauge-high icon"></i>
-                <h4>Pression</h4>
-                <p>{{ $weather['main']['pressure'] ?? '?' }} hPa</p>
-            </div>
+        <div class="text-center">
+            <img src="https://openweathermap.org/img/wn/{{ $weather['weather'][0]['icon'] }}@2x.png" alt="icon">
+            <h4>{{ ucfirst($weather['weather'][0]['description']) }}</h4>
+            <h2>{{ round($weather['main']['temp']) }}°C</h2>
         </div>
-    @endif
 
-    {{-- Prévisions 3 jours --}}
-    @if(($type ?? '') === 'forecast' && !empty($weather['list']))
-        <h3 class="text-center">Prévisions sur 3 jours pour {{ ucfirst($city ?? 'Dakar') }}</h3>
-        <div class="weather-info-grid">
-            @foreach($weather['list'] as $item)
-                @php
-                    $icon = $item['weather'][0]['icon'] ?? '01d';
-                    $desc = ucfirst($item['weather'][0]['description'] ?? '');
-                    $weatherClass = getWeatherClass($icon);
-                    $date = \Carbon\Carbon::parse($item['dt_txt'])->format('d/m H:i');
-                @endphp
-                <div class="weather-box {{ $weatherClass }}">
-                    <img src="https://openweathermap.org/img/wn/{{ $icon }}@2x.png" alt="">
-                    <h4>{{ $date }}</h4>
-                    <p><strong>{{ $desc }}</strong></p>
-                    <p>{{ $item['main']['temp'] ?? '?' }} °C</p>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-    {{-- Météo passée --}}
-    @if(($type ?? '') === 'historical' && !empty($weather['weather'][0]))
-        <h3 class="text-center">Météo passée pour {{ ucfirst($city ?? 'Dakar') }}</h3>
-        <form id="historicalForm" action="{{ route('weather.show') }}" method="GET" class="text-center">
-            <input type="hidden" name="city" value="{{ $city }}">
-            <input type="hidden" name="type" value="historical">
-            <label>Choisissez une date :</label>
-            <input type="date" name="date" max="{{ date('Y-m-d') }}" required>
-            <button type="submit">Voir</button>
-        </form>
         <div class="weather-info-grid mt-4">
-            @php
-                $icon = $weather['weather'][0]['icon'] ?? '01d';
-                $desc = ucfirst($weather['weather'][0]['description'] ?? '');
-                $weatherClass = getWeatherClass($icon);
-            @endphp
-            <div class="weather-box {{ $weatherClass }}">
-                <img src="https://openweathermap.org/img/wn/{{ $icon }}@2x.png" alt="">
-                <h4>{{ \Carbon\Carbon::parse($weather['current']['dt'])->format('d/m/Y') }}</h4>
-                <p><strong>{{ $desc }}</strong></p>
-                <p>{{ $weather['current']['temp'] ?? '?' }} °C</p>
+            <div class="weather-box">
+                <div class="icon">🌡️</div>
+                <h4>Température ressentie</h4>
+                <p>{{ round($weather['main']['feels_like']) }}°C</p>
+            </div>
+            <div class="weather-box">
+                <div class="icon">💨</div>
+                <h4>Vent</h4>
+                <p>{{ $weather['wind']['speed'] }} m/s</p>
+            </div>
+            <div class="weather-box">
+                <div class="icon">🌡️</div>
+                <h4>Pression</h4>
+                <p>{{ $weather['main']['pressure'] }} hPa</p>
+            </div>
+            <div class="weather-box">
+                <div class="icon">💧</div>
+                <h4>Humidité</h4>
+                <p>{{ $weather['main']['humidity'] }}%</p>
             </div>
         </div>
+    </div>
     @endif
+
+ <!--  Prévisions météo -->
+@if(isset($weather['list']) && count($weather['list']) > 0)
+    <h3 class="text-center mb-4">Prévisions pour {{ ucfirst($city) }}</h3>
+
+    <div class="row justify-content-center">
+        @foreach($weather['list'] as $f)
+            @php
+                $date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $f['dt_txt'])->locale('fr');
+                $icon = $f['weather'][0]['icon'] ?? '01d';
+                $temp = round($f['main']['temp']);
+                $desc = ucfirst($f['weather'][0]['description'] ?? '');
+            @endphp
+
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card shadow-sm text-center p-3">
+                    <!-- 📅 Date formatée en français -->
+                    <p class="fw-bold mb-1">
+                        {{ $date->isoFormat('ddd D MMM à HH[h]') }}
+                    </p>
+
+                    <!-- 🌤️ Icône météo -->
+                    <img src="https://openweathermap.org/img/wn/{{ $icon }}@2x.png" 
+                         alt="Météo" width="60" height="60">
+
+                    <!-- 🌡️ Température -->
+                    <h5 class="mt-2">{{ $temp }}°C</h5>
+
+                    <!-- 🌈 Description -->
+                    <p class="text-muted mb-0">{{ $desc }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endif
+
+
+
+    <!-- Carte -->
+    <div class="mt-5">
+        <h3 class="text-center mb-3">Localisation : {{ ucfirst($city) }}</h3>
+        <div id="map"></div>
+    </div>
+
+    {{-- @if($tidesRegion && $tidesCommune) --}}
+    {{-- <div class="text-center mt-4"> --}}
+        {{-- <a href="{{ route('tides.show', ['region' => $tidesRegion, 'commune' => $tidesCommune]) }}" --}}
+           {{-- class="btn btn-info">🌊 Voir les marées pour {{ ucfirst($city) }}</a> --}}
+    {{-- </div> --}}
+    {{-- @endif --}}
 </div>
 
-{{-- Carte --}}
-<div class="my-5">
-    <h3 class="text-center mb-4">Carte sommaire des alertes et positions</h3>
-    <div id="map"></div>
-</div>
-@endsection
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-@section('scripts')
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    var lat = {{ $lat ?? 14.6937 }};
+    var lon = {{ $lon ?? -17.4441 }};
+    var map = L.map('map').setView([lat, lon], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18, attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.marker([lat, lon]).addTo(map)
+        .bindPopup("<b>{{ ucfirst($city ?? 'Dakar') }}</b><br>Latitude: " + lat + "<br>Longitude: " + lon)
+        .openPopup();
+});
+
+// Changer d’onglet météo
 function showTab(tab) {
     const params = new URLSearchParams(window.location.search);
     params.set('type', tab);
     window.location.search = params.toString();
 }
-
-var map = L.map('map').setView([{{ $lat ?? 14.6928 }}, {{ $lon ?? -17.4467 }}], 8);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-L.marker([{{ $lat ?? 14.6928 }}, {{ $lon ?? -17.4467 }}]).addTo(map)
-    .bindPopup('{{ ucfirst($city ?? "Dakar") }}')
-    .openPopup();
 </script>
 @endsection
