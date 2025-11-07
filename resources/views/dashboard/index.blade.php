@@ -3,6 +3,12 @@
 @section('title', 'Tableau de bord — Nap ak karangue')
 
 @section('content')
+@if(session('success'))
+  <div class="alert alert-success text-center mt-3">
+    {{ session('success') }}
+  </div>
+@endif
+
 <style>
 /* --- Dashboard Container --- */
 .dashboard {
@@ -141,10 +147,13 @@
         <h3>Alertes</h3>
     </a>
 
-    <a href="{{ route('pirogues.index') }}" class="card">
-        <x-fas-ship class="icon-small text-indigo-700" />
-        <h3>Pirogues</h3>
-    </a>
+    {{-- ✅ Réservé aux administrateurs --}}
+    {{-- @if(Auth::user() && Auth::user()->role === 'admin') --}}
+        <a href="{{ route('pirogues.index') }}" class="card">
+            <x-fas-ship class="icon-small text-indigo-700" />
+            <h3>Pirogues</h3>
+        </a>
+    {{-- @endif --}}
 
     <a href="{{ route('gps.map') }}" class="card">
         <x-fas-map-marker-alt class="icon-small text-red-600" />
@@ -166,11 +175,12 @@
         <h3>Marées</h3>
     </a>
 
-    <a href="{{ route('agent_marins.index') }}" class="card">
-        <x-fas-user-shield class="icon-small text-yellow-600" />
-        <h3>Agents Marins</h3>
-    </a>
+    {{-- ✅ Réservé aux administrateurs --}}
+    {{-- @if(Auth::user() && Auth::user()->role === 'admin') --}}
+        <a href="{{ route('agent_marins.index') }}" class="card">
+            <x-fas-user-shield class="icon-small text-yellow-600" />
+            <h3>Agents Marins</h3>
+        </a>
+    {{-- @endif --}}
 </div>
 @endsection
-
-

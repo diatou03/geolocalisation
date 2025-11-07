@@ -101,4 +101,9 @@ class WeatherController extends Controller
             return [];
         }
     }
+    public function index()
+{
+    return view('weather.index'); // ou une autre vue appropriée
+}
+
 }

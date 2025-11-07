@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +14,8 @@ class LoginLog extends Model
         'longitude',
     ];
 
-    protected $table = 'logins'; // si ta table s'appelle encore "logins"
+    // le nom de la table
+    protected $table = 'login_logs';
 
     public function user()
     {

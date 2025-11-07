@@ -1,91 +1,104 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Localisation par IP</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 400px;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-        }
-        .info {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Localisation de l'utilisateur par IP</h1>
+@extends('layouts.app')
 
-    <button id="locateBtn">📍 Me localiser</button>
+@section('title', 'Ma position')
 
-    <div class="info" id="info" style="display: none;">
-        <p><strong>IP :</strong> <span id="ip"></span></p>
-        <p><strong>Pays :</strong> <span id="country"></span></p>
-        <p><strong>Ville :</strong> <span id="city"></span></p>
-        <p><strong>Latitude :</strong> <span id="lat"></span></p>
-        <p><strong>Longitude :</strong> <span id="lon"></span></p>
-        <p><strong>ID Enregistrement :</strong> <span id="record_id"></span></p>
+@section('content')
+<div class="container mt-4">
+    <h3 class="text-center mb-3">📍 Ma position</h3>
+
+    <!-- Bouton me localiser -->
+    <div class="text-center mb-3">
+        <button id="locateBtn" class="btn btn-primary">Me localiser</button>
     </div>
 
-    <div id="map"></div>
+    <!-- Bloc infos -->
+    <div id="info" class="card p-3 mb-3" style="display:none;">
+        <p><b>IP :</b> <span id="ip"></span></p>
+        <p><b>Pays :</b> <span id="country"></span></p>
+        <p><b>Ville :</b> <span id="city"></span></p>
+        <p><b>Latitude :</b> <span id="lat"></span></p>
+        <p><b>Longitude :</b> <span id="lon"></span></p>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script>
-        const btn = document.getElementById('locateBtn');
-        const infoBlock = document.getElementById('info');
-        let map = L.map('map').setView([0, 0], 2);
-        let marker = null;
+    <!-- Carte Leaflet -->
+    <div id="map" style="height:500px; border-radius:8px; border:1px solid #ddd;"></div>
+</div>
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-        }).addTo(map);
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-       btn.addEventListener('click', () => {
-        console.log('Bouton cliqué');
-    btn.disabled = true;
-    btn.textContent = "🔄 Localisation en cours...";
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-   fetch('/locate-by-ip', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    }
-})
-.then(res => res.json())
-.then(data => {
-    if (data.status === 'ok') {
-        infoBlock.style.display = 'block';
-        document.getElementById('ip').textContent = data.ip;
-        document.getElementById('country').textContent = data.country;
-        document.getElementById('city').textContent = data.city;
-        document.getElementById('lat').textContent = data.latitude;
-        document.getElementById('lon').textContent = data.longitude;
-        document.getElementById('record_id').textContent = data.record_id;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const info = document.getElementById('info');
+    const map = L.map('map').setView([14.7167, -17.4677], 6); // Sénégal par défaut
+    let marker = null;
 
-        const latlng = [data.latitude, data.longitude];
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const showPosition = (lat, lon, city = '', country = '', ip = '') => {
+        info.style.display = 'block';
+        document.getElementById('ip').textContent = ip;
+        document.getElementById('country').textContent = country;
+        document.getElementById('city').textContent = city;
+        document.getElementById('lat').textContent = lat;
+        document.getElementById('lon').textContent = lon;
+
+        const latlng = [lat, lon];
         if (marker) map.removeLayer(marker);
         marker = L.marker(latlng).addTo(map)
-            .bindPopup(`${data.city}, ${data.country}`).openPopup();
-        map.setView(latlng, 10);
-    } else {
-        alert('Erreur: ' + data.message);
+            .bindPopup((city ? city + ', ' : '') + (country || ''))
+            .openPopup();
+        map.setView(latlng, 12);
     }
-    btn.disabled = false;
-    btn.textContent = "📍 Me localiser";
-})
-.catch(err => {
-    alert('Erreur serveur ou réseau');
-    btn.disabled = false;
-    btn.textContent = "📍 Me localiser";
-    console.error(err);
-});
 
-});
+    const locateByIP = () => {
+        fetch('{{ route("gps.locate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || data.status !== 'ok') {
+                alert('Erreur localisation par IP : ' + (data?.message ?? 'aucune donnée'));
+                return;
+            }
+            showPosition(data.latitude, data.longitude, data.city, data.country, data.ip);
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erreur réseau / serveur : ' + err.message);
+        });
+    }
 
-    </script>
-</body>
-</html>
+    document.getElementById('locateBtn').addEventListener('click', () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    showPosition(lat, lon, 'Ma position', '', '');
+                },
+                err => {
+                    console.warn('Géolocalisation échouée :', err.message);
+                    alert('Impossible de récupérer votre position via le navigateur, utilisation de la localisation par IP.');
+                    locateByIP();
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        } else {
+            alert('Géolocalisation non supportée, utilisation de la localisation par IP.');
+            locateByIP();
+        }
+    });
+});
+</script>
+@endsection

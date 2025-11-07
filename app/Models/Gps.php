@@ -10,12 +10,12 @@ class Gps extends Model
     use HasFactory;
 
     protected $fillable = [
-        'device_id',
-        'latitude',
-        'longitude',
-        'altitude',
-        'speed',
-        'satellites',
-        'timestamp',
+        'user_id', 'ip', 'country', 'city', 'latitude', 'longitude',
     ];
+
+    // Relation avec l'utilisateur
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

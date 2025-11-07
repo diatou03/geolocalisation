@@ -89,5 +89,4 @@ class AgentMarinController extends Controller
 
         return redirect()->route('agent_marins.index')->with('success', 'Agent supprimé avec succès.');
     }
-    
 }

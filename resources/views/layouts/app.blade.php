@@ -14,10 +14,9 @@
       overflow-x: hidden;
       font-family: 'Roboto', sans-serif;
       background-color: #f5f6fa;
-      padding-top: 16vh; /* espace pour navbar fixe */
+      padding-top: 16vh;
     }
 
-    /* --- Navbar fixe et centrée --- */
     .navbar-custom {
       position: fixed;
       top: 0;
@@ -53,10 +52,9 @@
 
     .navbar-toggler { z-index: 1050; }
 
-    /* --- Sidebar --- */
     .sidebar {
       position: fixed;
-      top: 16vh; /* après navbar */
+      top: 16vh;
       left: 0;
       height: calc(100vh - 16vh);
       width: 250px;
@@ -101,28 +99,26 @@
     .sidebar::-webkit-scrollbar { width: 6px; }
     .sidebar::-webkit-scrollbar-thumb { background-color: #ffc107; border-radius: 3px; }
 
-    /* --- Main content --- */
     main.content {
       margin-left: 250px;
       padding: 2rem;
       min-height: calc(100vh - 16vh);
       transition: margin-left 0.3s;
     }
+
     .pirogue {
-  filter: brightness(0) invert(1); /* rend blanc sur fond sombre */
-  transition: transform 0.3s, filter 0.3s;
-}
+      filter: brightness(0) invert(1);
+      transition: transform 0.3s, filter 0.3s;
+    }
 
-.nav-link.active .pirogue,
-.nav-link:hover .pirogue {
-  transform: scale(1.2);
-  filter: brightness(0) saturate(100%) invert(89%) sepia(95%) saturate(5791%) hue-rotate(2deg) brightness(101%) contrast(101%);
-}
-
+    .nav-link.active .pirogue,
+    .nav-link:hover .pirogue {
+      transform: scale(1.2);
+      filter: brightness(0) saturate(100%) invert(89%) sepia(95%) saturate(5791%) hue-rotate(2deg) brightness(101%) contrast(101%);
+    }
 
     .sidebar.collapsed ~ main.content { margin-left: 70px; }
 
-    /* --- Responsive --- */
     @media (max-width: 992px) {
       .sidebar { left: -250px; }
       .sidebar.show { left: 0; }
@@ -133,72 +129,73 @@
 <body>
 
   <!-- Navbar -->
-  <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-  <div class="navbar-container">
-    <!-- Toggler gauche -->
-    <button class="navbar-toggler" type="button" aria-label="Toggle sidebar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="navbar-container">
+      @auth
+        <button class="navbar-toggler" type="button" aria-label="Toggle sidebar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      @endauth
 
-    <!-- Titre centré -->
-    <a class="navbar-brand fw-bold" href="#">NAP AK KARANGUE</a>
+      <a class="navbar-brand fw-bold" href="#">NAP AK KARANGUE</a>
 
-    <!-- Dropdown utilisateur droite -->
-    <div class="ms-auto">
-      <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white dropdown-toggle" id="userMenu"
-           data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://via.placeholder.com/32" class="rounded-circle" alt="utilisateur">
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-          <li><h6 class="dropdown-header">Utilisateur</h6></li>
-          <li><a class="dropdown-item" href="#">Profil</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="dropdown-item">Déconnexion</button>
-            </form>
-          </li>
-        </ul>
-      </div>
+      @auth
+        <div class="ms-auto">
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white dropdown-toggle" id="userMenu"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://via.placeholder.com/32" class="rounded-circle" alt="utilisateur">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+              <li><h6 class="dropdown-header">Utilisateur</h6></li>
+              <li><a class="dropdown-item" href="#">Profil</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <button type="submit" class="dropdown-item">Déconnexion</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        </div>
+      @endauth
     </div>
-  </div>
-</nav>
+  </nav>
 
   <!-- Sidebar -->
-  <div class="sidebar" id="sidebarCanvas">
-    <h4 class="text-center mb-4">MENU</h4>
-    <ul class="nav flex-column">
-      @php
-        $menuItems = [
-          ['label' => 'Tableau de bord', 'route' => 'dashboard', 'icon' => 'bi-house-door'],
-          ['label' => 'Alertes', 'route' => 'alertes.index', 'icon' => 'bi-bell'],
-          ['label' => 'Pirogues', 'route' => 'pirogues.index', 'icon' => 'bi-boat'],
-          ['label' => 'GPS', 'route' => 'gps.map', 'icon' => 'bi-geo-alt'],
-          ['label' => 'Positions', 'route' => 'positions.map', 'icon' => 'bi-geo-alt'],
-          ['label' => 'Météo', 'route' => 'weather.show', 'icon' => 'bi-cloud-rain'],
-          ['label' => 'Marées', 'route' => 'tides.index', 'icon' => 'bi-water'],
-          ['label' => 'Agents marins', 'route' => 'agent_marins.index', 'icon' => 'bi-person']
-        ];
-      @endphp
-
-      @foreach($menuItems as $item)
-        @php $isActive = request()->routeIs($item['route']) ? 'active' : ''; @endphp
-        <li class="nav-item mb-1">
-          <a href="{{ route($item['route']) }}" class="nav-link {{ $isActive }}">
-            @if ($item['label'] === 'Pirogues')
-              <img src="{{ asset('images/pirogue.png') }}" alt="Pirogue" class="pirogue">
-            @else
-              <i class="bi {{ $item['icon'] }} me-2 menu-icon"></i>
-            @endif
-            {{ $item['label'] }}
-          </a>
-        </li>
-      @endforeach
-    </ul>
-  </div>
+  @auth
+    <div class="sidebar" id="sidebarCanvas">
+      <h4 class="text-center mb-4">MENU</h4>
+      <ul class="nav flex-column">
+        @php
+          $menuItems = [
+            ['label' => 'Tableau de bord', 'route' => 'dashboard', 'icon' => 'bi-house-door'],
+            ['label' => 'Alertes', 'route' => 'alertes.index', 'icon' => 'bi-bell'],
+            ['label' => 'Pirogues', 'route' => 'pirogues.index', 'icon' => 'bi-boat'],
+            ['label' => 'GPS', 'route' => 'gps.map', 'icon' => 'bi-geo-alt'],
+            ['label' => 'Positions', 'route' => 'positions.map', 'icon' => 'bi-geo-alt'],
+            ['label' => 'Météo', 'route' => 'weather.show', 'icon' => 'bi-cloud-rain'],
+            ['label' => 'Marées', 'route' => 'tides.index', 'icon' => 'bi-water'],
+            ['label' => 'Agents marins', 'route' => 'agent_marins.index', 'icon' => 'bi-person']
+          ];
+        @endphp
+        @foreach($menuItems as $item)
+          @php $isActive = request()->routeIs($item['route']) ? 'active' : ''; @endphp
+          <li class="nav-item mb-1">
+            <a href="{{ route($item['route']) }}" class="nav-link {{ $isActive }}">
+              @if ($item['label'] === 'Pirogues')
+                <img src="{{ asset('images/pirogue.png') }}" alt="Pirogue" class="pirogue">
+              @else
+                <i class="bi {{ $item['icon'] }} me-2 menu-icon"></i>
+              @endif
+              {{ $item['label'] }}
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  @endauth
 
   <!-- Main content -->
   <main class="content">
@@ -213,9 +210,11 @@
     const sidebar = document.getElementById('sidebarCanvas');
     const toggler = document.querySelector('.navbar-toggler');
 
-    toggler.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
-    });
+    if (toggler && sidebar) {
+      toggler.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
   </script>
 
 </body>

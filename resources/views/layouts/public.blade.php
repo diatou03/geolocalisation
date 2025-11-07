@@ -92,7 +92,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="{{ url('/') }}">
-       Bienvenue sur la plateforme 🌊 Nap ak karangue
+       Bienvenue sur la plateforme 🌊 Nap Ak karangue
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"

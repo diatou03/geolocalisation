@@ -8,11 +8,8 @@ class Kernel extends HttpKernel
 {
     /**
      * Les middlewares globaux qui s'exécutent pour chaque requête HTTP.
-     *
-     * @var array<int, class-string|string>
      */
     protected $middleware = [
-        // Middleware de maintenance, vérification des tailles des requêtes, etc.
         \App\Http\Middleware\TrustProxies::class,
         \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
@@ -23,15 +20,12 @@ class Kernel extends HttpKernel
 
     /**
      * Les groupes de middlewares, assignés à des routes ou groupes de routes.
-     *
-     * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -45,8 +39,6 @@ class Kernel extends HttpKernel
 
     /**
      * Middleware que l'on peut appliquer à des routes individuelles.
-     *
-     * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -58,22 +50,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
+        // ✅Ton middleware admin personnalisé
+        'admin' => \App\Http\Middleware\IsAdmin::class,
     ];
-    protected function schedule(Schedule $schedule)
-{
-    $schedule->command('meteo:fetch')->hourly(); // ou toutes les X minutes selon ton besoin
-    $schedule->call(function () {
-        // Appel à votre méthode d'envoi d’alerte FCM
-        app(\App\Http\Controllers\WeatherAlertController::class)->sendAlerts();
-    
-     \Log::info('Tâche planifiée exécutée à ' . now());
-    })->everyMinute();
 }
-protected $commands = [
-    Commands\FetchMeteo::class,
-];
-
-}
-
-
-

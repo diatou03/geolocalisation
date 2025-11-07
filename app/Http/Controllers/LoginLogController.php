@@ -10,6 +10,15 @@ use App\Models\LoginLog;
 class LoginLogController extends Controller
 {
     // 1️⃣ Affiche le formulaire de connexion
+    protected function authenticated(Request $request, $user)
+   {
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard'); // ou ton nom de route admin
+    }
+
+    return redirect('/'); // page d'accueil ou autre page pour user normal
+   }
+
     public function index()
     {
         return view('login.index');
@@ -39,7 +48,8 @@ class LoginLogController extends Controller
                 'longitude' => $geo['lon'] ?? null,
             ]);
 
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard')
+         ->with('success', 'Bienvenue ' . Auth::user()->name . ', vous êtes connecté avec succès !');
         }
 
         return back()->withErrors([
@@ -70,7 +80,7 @@ class LoginLogController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('success', 'Bienvenue ' . Auth::user()->name . ', vous êtes connecté avec succès !');
     }
 
     // 5️⃣ Déconnexion

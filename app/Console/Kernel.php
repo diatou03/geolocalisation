@@ -23,28 +23,16 @@ class Kernel extends ConsoleKernel
      * @return void
      */
    protected function schedule(Schedule $schedule): void
-{
-    $schedule->command('alerts:send-weather-tide')
-        ->hourly()
-        ->between('6:00', '20:00')     // Ne s'exécute qu'entre 6h et 20h
-        ->weekdays()                   // Et uniquement en semaine
-        ->when(function () {
-            // Logique conditionnelle : retourne true si on veut envoyer une alerte
-            $weather = app(\App\Http\Controllers\WeatherAlertController::class)
-                        ->fetchWeatherData(); // méthode à créer
-            $tide    = app('App\Http\Controllers\WeatherAlertController')
-                        ->fetchTideData();    // idem
+    {
+        $schedule->command('alerts:send-weather-tide')
+                 ->hourly()
+                 ->between('6:00', '20:00')
+                 ->weekdays()
+                 ->withoutOverlapping()
+                 ->onSuccess(fn () => logger()->info('✅ Alerte envoyée par scheduler'))
+                 ->onFailure(fn () => logger()->error('❌ Échec envoi alerte scheduler'));
+    }
 
-            // Vérifier les conditions selon ton contrôle météo/marée
-            if ($weather['wind'] >= 17.2 || $weather['rain'] >= 10 || $tide['high'] >= 2.0) {
-                return true;
-            }
-            return false;
-        })
-        ->withoutOverlapping()
-        ->onSuccess(fn () => logger()->info('Alerte météo/marée envoyée automatiquement.'))
-        ->onFailure(fn () => logger()->error('Échec envoi alerte auto.'));
-}
 
     protected function commands(): void
     {

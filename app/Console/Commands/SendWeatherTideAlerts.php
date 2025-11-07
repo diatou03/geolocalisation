@@ -7,12 +7,25 @@ use App\Http\Controllers\WeatherAlertController;
 
 class SendWeatherTideAlerts extends Command
 {
+    // Nom de la commande artisan
     protected $signature = 'alerts:send-weather-tide';
-    protected $description = 'Envoi automatique des alertes météo et marées';
+
+    // Description
+    protected $description = 'Envoie automatiquement des alertes météo et marée';
 
     public function handle()
     {
-        (new WeatherAlertController)->send();
-        $this->info('Alertes météo et marées envoyées.');
+        $controller = app(WeatherAlertController::class);
+
+        $weather = $controller->fetchWeatherData(); // récupère les données météo
+        $tide    = $controller->fetchTideData();    // récupère les données marée
+
+        // Vérifie les conditions pour envoyer une alerte
+        if ($weather['wind'] >= 17.2 || $weather['rain'] >= 10 || $tide['high'] >= 2.0) {
+            $controller->sendAlerts();  // méthode qui envoie les notifications FCM ou email
+            $this->info('✅ Alerte météo/marée envoyée.');
+        } else {
+            $this->info('ℹ️ Conditions normales, aucune alerte.');
+        }
     }
 }
